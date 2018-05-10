@@ -32,6 +32,7 @@ a{
     box-shadow: 0px 0px 10px rgba(0,0,0,0.25);
     padding:10px 0;
     color:#3d4451;
+    z-index: 1;
 }
 .topNavBarinner{
    padding:0 16px;
@@ -54,6 +55,16 @@ a{
 }
 .topNavBar .logo .card{
     color: #9a9da2;
+}
+[data-x].offset{
+    transform:translateY(100px);
+    opacity: .2;
+}
+
+[data-x]{
+    transform:translateY(0);
+    opacity: 1;
+    transition: all 1.2s;
 }
 .topNavBar nav{
     padding-top: 5px;
@@ -86,7 +97,8 @@ a{
     position: relative;
 }
 
-.topNavBar  nav.menu > ul > li.active > a::after {
+.topNavBar  nav.menu > ul > li.active > a::after,
+.topNavBar  nav.menu > ul > li.highlight >a::after {
     display: block;
     content: '';
     position: absolute;
@@ -293,13 +305,21 @@ section.skills .progressBar{
     background: #FAE1E1;
     margin:4px 0 40px;
     border-radius: 4px;
-
+    overflow: hidden;
 }
+
 section.skills .progressBar .progress{
     height: 100%;
     background: #CF5D5F;
-    width: 60%;
     border-radius: 4px;
+    /*translateX X方向平移 */
+    transform: translateX(0);
+    transition: all 1.8s;
+
+
+}
+section.skills.offset .progress{
+    transform: translateX(-100%)
 }
 section.skills ol li{
     float:left;
@@ -308,15 +328,7 @@ section.skills ol li{
 section.skills ol li:nth-child(even){
     float:right;
 }
-section.skills ol li:nth-child(3) .progress{
-    width: 90%;
-}
-section.skills ol li:nth-child(2) .progress{
-    width: 70%;
-}
-section.skills ol li:nth-child(4) .progress{
-    width: 80%;
-}
+
 
 section.skills ol li h3{
     font-weight: normal;

@@ -65,10 +65,10 @@
 </head>
 
 <body>
-    <!-- loading -->
-    <div id="siteWelcom" class="site-welcom active">
+    <!-- loading 加载动画 -->
+    <!-- <div id="siteWelcom" class="site-welcom active">
         <div class="loading"></div>
-    </div>
+    </div> -->
     <!-- loading end-->
 
     <!-- topNavBar start -->
@@ -116,7 +116,7 @@
     <!-- card & downloadResume & selfIntroduction start-->
     <main>
         <!-- cardPerson start -->
-        <div id="siteAbout" class="cardPerson">
+        <div data-x id="siteAbout" class="cardPerson">
             <div class="pictureAndText clearfix">
                 <div class="picture">
                     <img src="img/my.jpg" width=299 height=347 alt="头像">
@@ -176,50 +176,50 @@
 
     <!-- 技能 -->
     
-    <section id="siteSkills" class="skills">
+    <section data-x id="siteSkills" class="skills">
         <h2>技能</h2>
         <ol class="clearfix">
             <li>
                 <h3>HTML 5 & CSS 3</h3>
                 <div class="progressBar">
-                    <div class="progress"></div>
+                    <div class="progress" style="width:60%"></div>
                 </div>
             </li>
             <li>
                 <h3>JavaScript</h3>
                 <div class="progressBar">
-                    <div class="progress"></div>
+                    <div class="progress" style="width:30%"></div>
                 </div>
             </li>
             <li>
                 <h3>jQuery</h3>
                 <div class="progressBar">
-                    <div class="progress"></div>
+                    <div class="progress" style="width:40%"></div>
                 </div>
 
             </li>
             <li>
                 <h3>Vue</h3>
                 <div class="progressBar">
-                    <div class="progress"></div>
+                    <div class="progress" style="width:60%"></div>
                 </div>
             </li>
             <li>
                 <h3>React</h3>
                 <div class="progressBar">
-                    <div class="progress"></div>
+                    <div class="progress" style="width:30%"></div>
                 </div>
             </li>
             <li>
                 <h3>Angular</h3>
                 <div class="progressBar">
-                    <div class="progress"></div>
+                    <div class="progress" style="width:30%"></div>
                 </div>
             </li>
         </ol>
     </section >
     <!-- 作品集 -->
-    <section id="sitePortfolio" class="portfolio">
+    <section data-x id="sitePortfolio" class="portfolio">
         <h2> 作品集</h2>
         <nav>
             <ol class="clearfix">
@@ -254,18 +254,14 @@
             </div>
         </div>
     </section>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/17.1.1/Tween.min.js"></script>
     <script>
-        setTimeout(function(){
-            siteWelcom.classList.remove('active')
-        },1000)
+        //页面加载延迟的话 出现的加载动态
+        // setTimeout(function(){
+        //     siteWelcom.classList.remove('active')
+        // },1000)
 
-        window.onscroll=function(e){
-            if(window.scrollY>0){
-                topBar.classList.add('sticky')
-            }else{
-                topBar.classList.remove('sticky')
-            }
-        }
+
         // 导航菜单高亮及子菜单出现
         let liTages=document.querySelectorAll('nav.menu > ul > li')
         for(let i=0;i<liTages.length;i++){
@@ -276,7 +272,13 @@
                 ev.currentTarget.classList.remove('active')
             }
         }
+
         // 类似锚文本跳转功能
+        function animate(time) {// Setup the animation loop.
+            requestAnimationFrame(animate);
+            TWEEN.update(time);
+        }
+        requestAnimationFrame(animate);
         let aTags=document.querySelectorAll('nav.menu >ul >li >a')
         for(let i=0;i<aTags.length;i++){
             aTags[i].onclick=function(ev){
@@ -284,10 +286,92 @@
                 let a =ev.currentTarget;
                 let href = a.getAttribute('href')
                 let element=document.querySelector(href)
-                let top = parseInt(element.offsetTop - 80)
-                window.scrollTo(0,top)//移动到对应的x,y坐标位置上
+                console.log(href)
+                let targetTop = parseInt(element.offsetTop- 80)//元素距页面顶部高度-80
+                let currentTop = window.scrollY //当前移动位置的y坐标
+                let s = targetTop - currentTop // 路程
+                var coords = { y: currentTop}; // 起始位置
+                var t = Math.abs((s/100)*300) // 时间 Math.abs去绝对值
+                if(t>500){ t = 500 }
+
+                var tween = new TWEEN.Tween(coords) // 起始位置
+                .to({ y: targetTop}, t) // 结束位置 和 时间
+                .easing(TWEEN.Easing.Cubic.InOut) // 缓动类型
+                .onUpdate(function() {
+                    window.scrollTo(0,coords.y) // 如何更新界面 到对应y坐标位置
+                })
+                .start(); // 开始缓动
+  
+               
             }
         }
+        // 类似锚文本跳转功能 end----------------------------------------------
+
+        //页面模块从上到下 渐入效果
+        let specialTags =document.querySelectorAll('[data-x]');
+        for(let i =0; i<specialTags.length; i++){
+            specialTags[i].classList.add('offset')
+        }
+        findClose()
+        pageElementLoad()
+        window.onscroll=function(e){
+            if(window.scrollY>0){//导航背景渐变
+                topBar.classList.add('sticky')
+            }else{
+                topBar.classList.remove('sticky')
+            }
+            //找到距离页面顶部 最近的目标元素 对应的导航 加高亮
+            findClose()
+            //页面内容延缓出现
+            pageElementLoad()
+        }
+
+        //工具函数以下
+
+        //找到距离页面顶部 最近的目标元素
+        function findClose(){
+            let minIndex=0;
+            //找到距离页面顶部 最近的 data-x 元素组里的 minIndex 索引
+            for(let i = 1;i<specialTags.length;i++){
+                if( Math.abs(specialTags[i].offsetTop - window.scrollY) < Math.abs(specialTags[minIndex].offsetTop - window.scrollY)){
+                    minIndex=i
+                }
+                
+            }
+            //找到最近距离的data-x元素后 找到对应的导航 加高亮 主要代码
+            let targetId = specialTags[minIndex].id
+            let targetA = document.querySelector('a[href="#' + targetId +'"]')
+            let targetLi = targetA.parentNode
+            let brothersAndMe = targetLi.parentNode.children
+            
+            for(let i = 0; i<brothersAndMe.length; i++){
+                brothersAndMe[i].classList.remove('highlight')
+            }
+            targetLi.classList.add('highlight')
+        }
+
+        //页面目标元素块 延缓出现
+       function pageElementLoad(){
+        let loadTarget = 0;
+        for(let i = 1;i<specialTags.length;i++){
+            let targetY=specialTags[i].offsetTop
+            if(Math.abs(targetY - window.scrollY) < parseFloat(targetY-targetY/3)){
+                loadTarget=i;
+            }
+          
+        }
+        //解决:页面在翻到最后 刷新页面时，前面的页面内容不出现的bug
+            if(loadTarget == specialTags.length-1){
+                for(let i = 0;i<specialTags.length;i++){
+                    specialTags[i].classList.remove('offset')
+                }
+            }
+            else if(loadTarget == specialTags.length-2){
+                specialTags[0].classList.remove('offset')
+            }else{
+            }
+        specialTags[loadTarget].classList.remove('offset')
+       }
 
     </script>
 </body>
